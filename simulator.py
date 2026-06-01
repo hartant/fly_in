@@ -47,6 +47,7 @@ class Simulator:
                     continue
 
                 zone_occupancy[dest] = zone_occupancy.get(dest, 0) + 1
+                dr.prev_zone = dr.current_zone 
                 dr.current_zone = dest
                 dr.in_transit = False
                 dr.transit_destination = None
@@ -90,10 +91,12 @@ class Simulator:
                     dr.transit_destination = nxt
 
                     old_zone = dr.current_zone
+                    dr.prev_zone = dr.current_zone
                     dr.current_zone = nxt
                     moves.append(f"D{dr.id}-{old_zone}_{nxt}") 
 
                 else:
+                    dr.prev_zone = dr.current_zone
                     dr.current_zone = nxt
                     if nxt == self.end.name:
                         dr.arrived = True

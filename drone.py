@@ -9,6 +9,7 @@ class Drone:
     arrived: bool = False
     in_transit: bool = False
     transit_destination: str | None = None
+    prev_zone: str | None = None
 
     def next_zone(self) -> str | None:
         try:
