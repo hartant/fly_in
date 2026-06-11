@@ -2,7 +2,7 @@ MAP ?= map.txt
 
 install:
 	python3 -m venv venv
-	./venv/bin/pip install pygame pytest mypy flake8
+	./venv/bin/pip install pygame mypy flake8
 
 run:
 	python3 main.py $(MAP)

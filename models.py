@@ -32,3 +32,11 @@ class ParseResult:
     hubs: dict[str, HUB]
     start: HUB
     end: HUB
+
+    def __post_init__(self):
+        hub_position = [(x.x, x.y) for _,x in self.hubs.items()]
+        if len(hub_position) != len(set(hub_position)):
+            raise ParserError(0, "Duplicate position of zone !")
+        connection_names = sorted((x.name, y) for _, x in self.hubs.items() for y in x.links)
+        if len(connection_names) != len(set(connection_names)):
+            raise ParserError(0, "zone connection with itself !")

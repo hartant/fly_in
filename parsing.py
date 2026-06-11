@@ -90,7 +90,11 @@ def fileparse(filename: str) -> ParseResult:
                     continue
                 raise ParserError(i, "unrecognized line syntax")
 
-                            
+            if start_obj and len(start_obj.links) == 0:
+                raise ParserError(0, "start hub has no connections")
+
+            if end_obj and len(end_obj.links) == 0:
+                raise ParserError(0, "end hub has no connections")            
             if dr_n is None:
                 raise ParserError(0, "nb_drones not defined")
             if start_hub != 1:
@@ -114,6 +118,8 @@ def parse_metadata(meta: str | None, line_num: int) -> dict[str, str | int]:
         if '=' not in  token:
             raise ParserError( line_num,f" invalid token")
         key, value =  token.split('=',1)
+        if key in meta_s:
+            raise ParserError(line_num, f"duplicate key '{key}'")
         if key == 'zone':
             if value not in VALID_ZONES:
                 raise ParserError(line_num, f"invalid zone type '{value}'")

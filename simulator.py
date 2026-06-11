@@ -25,6 +25,7 @@ class Simulator:
             turn += 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    print("sgsj")
                     pygame.quit()
                     return
             zone_occupancy: dict[str, int] = {}
