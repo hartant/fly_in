@@ -5,6 +5,7 @@ from drone import Drone
 from pathfinding import find_path, find_all_paths
 from visual import Visual
 import pygame
+import sys
 
 class Simulator:
     def __init__(self, result : ParseResult, graph : Graph) -> None:
@@ -25,9 +26,8 @@ class Simulator:
             turn += 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    print("sgsj")
                     pygame.quit()
-                    return
+                    sys.exit(0)
             zone_occupancy: dict[str, int] = {}
             conn_usage: dict[tuple[str, str], int] = {}
             moves: list[str] = []

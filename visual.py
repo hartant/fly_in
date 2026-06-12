@@ -3,6 +3,7 @@ import pygame
 import math
 from models import HUB
 from graph import Graph
+import sys
 
 FPS = 60
 ANIMATION_DURATION = 2
@@ -206,7 +207,7 @@ class Visual:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    return
+                    sys.exit(0)
 
             progress = frame / total_frames
 
