@@ -28,24 +28,31 @@ class Simulator:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit(0)
+
             zone_occupancy: dict[str, int] = {}
             conn_usage: dict[tuple[str, str], int] = {}
             moves: list[str] = []
             moved_this_turn: set[int] = set()
 
             for dr in self.drones:
+                if not dr.arrived and not dr.in_transit:
+                    zone_occupancy[dr.current_zone] = zone_occupancy.get(dr.current_zone, 0) + 1
 
+
+            for dr in self.drones:
                 if not dr.in_transit:
                     continue
 
                 dest = dr.transit_destination
                 if dest is None:
                     continue
+                
                 current = zone_occupancy.get(dest, 0)
                 max_cap = self.graph.hubs[dest].max_drones
 
                 if current >= max_cap:
                     continue
+
 
                 zone_occupancy[dest] = zone_occupancy.get(dest, 0) + 1
                 dr.prev_zone = dr.current_zone 
@@ -59,14 +66,11 @@ class Simulator:
                 moved_this_turn.add(dr.id)
                 moves.append(f"D{dr.id}-{dest}")
                 
-            for dr in self.drones:
 
-                if dr.arrived:
+            for dr in self.drones:
+                if dr.arrived or dr.in_transit or dr.id in moved_this_turn:
                     continue
-                if dr.in_transit:
-                    continue
-                if dr.id in moved_this_turn:
-                    continue
+                
                 nxt = dr.next_zone()
                 if nxt is None:
                     continue
@@ -84,6 +88,10 @@ class Simulator:
                 if current_on_conn >= max_conn:
                     continue
 
+
+                if dr.current_zone in zone_occupancy and zone_occupancy[dr.current_zone] > 0:
+                    zone_occupancy[dr.current_zone] -= 1
+
                 zone_occupancy[nxt] = zone_occupancy.get(nxt, 0) + 1
                 conn_usage[conn] = conn_usage.get(conn, 0) + 1
 
@@ -95,14 +103,12 @@ class Simulator:
                     dr.prev_zone = dr.current_zone
                     dr.current_zone = nxt
                     moves.append(f"D{dr.id}-{old_zone}_{nxt}") 
-
                 else:
                     dr.prev_zone = dr.current_zone
                     dr.current_zone = nxt
                     if nxt == self.end.name:
                         dr.arrived = True
                     moves.append(f"D{dr.id}-{nxt}")
-
 
             if moves:
                 print(" ".join(moves))

@@ -50,12 +50,15 @@ def fileparse(filename: str) -> ParseResult:
                     if name in hub_dic:
                         raise ParserError(i ,f" duplicate zone name '{name };" )
                     ob_hub = HUB(name, x, y, h_type, meta)
+                    ob_hub.line_num = i
 
                     if h_type == "start_hub":
+                        start_line = i
                         start_hub += 1
                         start_obj = ob_hub   
 
                     if h_type == "end_hub":
+                        end_line = i 
                         end_hub += 1
                         end_obj = ob_hub     
 
@@ -90,11 +93,14 @@ def fileparse(filename: str) -> ParseResult:
                     continue
                 raise ParserError(i, "unrecognized line syntax")
 
+            for name, h in hub_dic.items():
+                if len(h.links) == 0 and h.zone_type != 'blocked':
+                    raise ParserError(h.line_num, f"zone '{name}' has no connections")
             if start_obj and len(start_obj.links) == 0:
-                raise ParserError(0, "start hub has no connections")
+                raise ParserError(i, "start hub has no connections")
 
             if end_obj and len(end_obj.links) == 0:
-                raise ParserError(0, "end hub has no connections")            
+                raise ParserError(i, "end hub has no connections")            
             if dr_n is None:
                 raise ParserError(0, "nb_drones not defined")
             if start_hub != 1:

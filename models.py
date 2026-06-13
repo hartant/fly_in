@@ -18,6 +18,7 @@ class HUB:
     h_type: str
     meta_dict: dict[str, str | int]
     links: list[str] = field(default_factory=list)
+    line_num : int = 0 
 
     def __post_init__(self) ->None:
         self.zone_type = self.meta_dict.get('zone', 'normal')
