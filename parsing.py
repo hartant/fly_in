@@ -63,11 +63,12 @@ def fileparse(filename: str) -> ParseResult:
                         end_obj = ob_hub     
 
                     if start_hub > 1:
-                        raise ParserError(i, " starthub must be only one time ")
+                        raise ParserError(i, "start_hub must appear only once")
 
-                    if end_hub > 1 :
-                        raise ParserError(i, " end hub  must be only one time ")
-                    hub_dic[name]= ob_hub
+                    if end_hub > 1:
+                        raise ParserError(i, "end_hub must appear only once")
+
+                    hub_dic[name] = ob_hub
                     continue
 
                 cn = CONN.match(line)
@@ -93,22 +94,23 @@ def fileparse(filename: str) -> ParseResult:
                     continue
                 raise ParserError(i, "unrecognized line syntax")
 
-            for name, h in hub_dic.items():
-                if len(h.links) == 0 and h.zone_type != 'blocked':
-                    raise ParserError(h.line_num, f"zone '{name}' has no connections")
-            if start_obj and len(start_obj.links) == 0:
-                raise ParserError(i, "start hub has no connections")
-
-            if end_obj and len(end_obj.links) == 0:
-                raise ParserError(i, "end hub has no connections")            
             if dr_n is None:
                 raise ParserError(0, "nb_drones not defined")
             if start_hub != 1:
                 raise ParserError(0, "no start_hub defined")
-            if end_hub != 1 :
+            if end_hub != 1:
                 raise ParserError(0, "no end_hub defined")
 
-            return ParseResult(dr_n, hub_dic, start_obj, end_obj)
+            if start_obj and len(start_obj.links) == 0:
+                raise ParserError(start_obj.line_num, "start hub has no connections")
+            if end_obj and len(end_obj.links) == 0:
+                raise ParserError(end_obj.line_num, "end hub has no connections")
+
+            for name, h in hub_dic.items():
+                if len(h.links) == 0 and h.zone_type != 'blocked':
+                    raise ParserError(h.line_num, f"zone '{name}' has no connections")
+
+        return ParseResult(dr_n, hub_dic, start_obj, end_obj)
     except FileNotFoundError:
         raise ParserError(0, f"file '{filename}' not found")
 

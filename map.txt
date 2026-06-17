@@ -1,4 +1,4 @@
-nb_drones: 5
+nb_drones: 1999
 start_hub: hub 0 0 [color=green]
 end_hub: goal 10 10 [color=yellow]
 hub: roof1 3 4 [zone=restricted color=red]
@@ -11,4 +11,4 @@ connection: hub-corridorA
 connection: roof1-roof2
 #connection: roof2-goal
 connection: corridorA-tunnelB [max_link_capacity=2]
-#connection: tunnelB-goal
+connection: tunnelB-goal

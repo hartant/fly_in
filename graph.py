@@ -5,7 +5,7 @@ ZONE_COST = {
     "normal":1,
     "restricted":2,
     "priority": 1,
-    "blocked":0,
+    "blocked": float('inf'),
 }
 
 class Graph:
