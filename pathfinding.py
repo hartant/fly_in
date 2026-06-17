@@ -54,12 +54,23 @@ def find_all_paths(start: HUB, end: HUB, graph: Graph, n: int) -> list[list[str]
     paths = []
     blocked: set[str] = set()
 
-    for _ in range(n):
+    while len(paths) < n:
         path = find_path_with_blocked(start, end, graph, blocked)
         if not path:
             break
-        paths.append(path)
-        for zone in path[1:2]:   
+
+
+        throughput = min(
+            graph.hubs[z].max_drones
+            for z in path[1:-1]
+        ) if len(path) > 2 else n
+
+
+        for _ in range(min(throughput, n - len(paths))):
+            paths.append(path)
+
+
+        for zone in path[1:-1]:
             blocked.add(zone)
 
     if not paths:

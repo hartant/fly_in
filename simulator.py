@@ -15,7 +15,7 @@ class Simulator:
         self.visual = Visual(graph, result.start, result.end)
 
         self.drones =  [Drone(id = i , current_zone= result.start.name ) for i  in range(1 , result.nb_drones + 1 )  ]
-        paths = find_all_paths(result.start, result.end, graph, 3)
+        paths = find_all_paths(result.start, result.end, graph, result.nb_drones)
         for i, drone in enumerate(self.drones):
             drone.path = paths[i % len(paths)]
     
