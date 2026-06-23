@@ -67,6 +67,7 @@ def fileparse(filename: str) -> ParseResult:
 
                     if end_hub > 1:
                         raise ParserError(i, "end_hub must appear only once")
+                    
 
                     hub_dic[name] = ob_hub
                     continue
@@ -105,6 +106,9 @@ def fileparse(filename: str) -> ParseResult:
                 raise ParserError(start_obj.line_num, "start hub has no connections")
             if end_obj and len(end_obj.links) == 0:
                 raise ParserError(end_obj.line_num, "end hub has no connections")
+            
+            if end_obj.zone_type == 'blocked':
+                raise ParserError(end_obj.line_num,"no path found")
 
             for name, h in hub_dic.items():
                 if len(h.links) == 0 and h.zone_type != 'blocked':

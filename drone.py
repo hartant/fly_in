@@ -6,21 +6,15 @@ class Drone:
     id: int
     current_zone: str
     path: list[str] = field(default_factory=list)
+    path_index: int = 0
     arrived: bool = False
     in_transit: bool = False
     transit_destination: str | None = None
     prev_zone: str | None = None
 
     def next_zone(self) -> str | None:
-        try:
-
-            idx = self.path.index(self.current_zone)
-        except ValueError:
+        nxt = self.path_index + 1
+        if nxt >= len(self.path):
             return None
-
-
-        idx += 1 
-        if idx >= len(self.path):
-            return None
+        return self.path[nxt]
         
-        return self.path[idx]
