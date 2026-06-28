@@ -24,6 +24,9 @@ def main() -> None:
         print("\nSimulation interrupted by user.")
         pygame.quit()
         sys.exit(0)
+    except ValueError as e:
+        print(e)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

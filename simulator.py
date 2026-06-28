@@ -16,6 +16,11 @@ class Simulator:
 
         self.drones =  [Drone(id = i , current_zone= result.start.name ) for i  in range(1 , result.nb_drones + 1 )  ]
         paths = find_all_paths(result.start, result.end, graph, result.nb_drones)
+        if not paths or not paths[0]:
+            raise ValueError(
+        f"No path found from '{result.start.name}' to '{result.end.name}' — "
+        f"check if goal is reachable (blocked zones?)"
+    )
         for i, drone in enumerate(self.drones):
             drone.path = paths[i % len(paths)]
     
