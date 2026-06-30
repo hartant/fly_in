@@ -44,7 +44,6 @@ make clean            # remove __pycache__, .mypy_cache, .pytest_cache
 
 ```bash
 python3 main.py map.txt
-python3 main.py --capacity-info map.txt   # also print per-zone / per-connection usage
 ```
 
 Press the window's close button or Ctrl+C at any time to stop the simulation
