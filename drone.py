@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Drone:
     id: int
@@ -17,4 +18,3 @@ class Drone:
         if nxt >= len(self.path):
             return None
         return self.path[nxt]
-        

@@ -4,10 +4,9 @@ from models import HUB
 from graph import Graph
 
 
-
-def find_path(start:HUB , end:HUB , graph:Graph) -> list[str]:
-    que = [(0,[start.name]) ]
-    visted = set()
+def find_path(start: HUB, end: HUB, graph: Graph) -> list[str]:
+    que: list[tuple[float, list[str]]] = [(0, [start.name])]
+    visted: set[str] = set()
     while que:
         cost, path = heapq.heappop(que)
         cur = path[-1]
@@ -18,15 +17,20 @@ def find_path(start:HUB , end:HUB , graph:Graph) -> list[str]:
 
         visted.add(cur)
         for neighbor in graph.get_neighbors(cur):
-            if not graph.is_blocked(neighbor.name) and neighbor.name not in visted:
-                new_cost = cost + graph.get_cost(neighbor.zone_type)
+            if (not graph.is_blocked(neighbor.name)
+                    and neighbor.name not in visted):
+                zone_type = str(neighbor.zone_type)
+                new_cost = cost + graph.get_cost(zone_type)
                 heapq.heappush(que, (new_cost, path + [neighbor.name]))
-    
+
     return []
 
-def find_path_with_blocked(start: HUB, end: HUB, graph: Graph, blocked: set[str]) -> list[str]:
-    que = [(0,[start.name]) ]
-    visted = set()
+
+def find_path_with_blocked(
+    start: HUB, end: HUB, graph: Graph, blocked: set[str]
+) -> list[str]:
+    que: list[tuple[float, list[str]]] = [(0, [start.name])]
+    visted: set[str] = set()
     while que:
         cost, path = heapq.heappop(que)
         cur = path[-1]
@@ -41,17 +45,19 @@ def find_path_with_blocked(start: HUB, end: HUB, graph: Graph, blocked: set[str]
                 continue
             if neighbor.name in visted:
                 continue
-            if neighbor.name in blocked:   
+            if neighbor.name in blocked:
                 continue
-            new_cost = cost + graph.get_cost(neighbor.zone_type)
+            zone_type = str(neighbor.zone_type)
+            new_cost = cost + graph.get_cost(zone_type)
             heapq.heappush(que, (new_cost, path + [neighbor.name]))
 
     return []
 
-    
 
-def find_all_paths(start: HUB, end: HUB, graph: Graph, n: int) -> list[list[str]]:
-    paths = []
+def find_all_paths(
+    start: HUB, end: HUB, graph: Graph, n: int
+) -> list[list[str]]:
+    paths: list[list[str]] = []
     blocked: set[str] = set()
 
     while len(paths) < n:
@@ -59,16 +65,13 @@ def find_all_paths(start: HUB, end: HUB, graph: Graph, n: int) -> list[list[str]
         if not path:
             break
 
-
         throughput = min(
             graph.hubs[z].max_drones
             for z in path[1:-1]
         ) if len(path) > 2 else n
 
-
         for _ in range(min(throughput, n - len(paths))):
             paths.append(path)
-
 
         for zone in path[1:-1]:
             blocked.add(zone)

@@ -1,12 +1,13 @@
 from __future__ import annotations
-import pygame
+import sys
 import math
+import pygame
 from models import HUB
 from graph import Graph
-import sys
 
 FPS = 60
 ANIMATION_DURATION = 2
+
 
 class Visual:
     def __init__(self, graph: Graph, start: HUB, end: HUB) -> None:
@@ -48,7 +49,9 @@ class Visual:
         "blocked":    (50,  50,  50),
     }
 
-    def resolve_color(self, color_str: str | None, zone_type: str) -> tuple[int, int, int]:
+    def resolve_color(
+        self, color_str: str | None, zone_type: str
+    ) -> tuple[int, int, int]:
         """Resolve a color string from map metadata to an RGB tuple."""
         if color_str:
             name = str(color_str).lower().strip()
@@ -73,13 +76,13 @@ class Visual:
         ys = [h.y for h in hubs]
         min_x, max_x = min(xs), max(xs)
         min_y, max_y = min(ys), max(ys)
-        W, H = self.screen.get_size()
+        win_w, win_h = self.screen.get_size()
         margin_x = 120
         margin_y = 80
         span_x = max_x - min_x or 1
         span_y = max_y - min_y or 1
-        scale_x = (W - 2 * margin_x) / span_x
-        scale_y = (H - 2 * margin_y - 40) / span_y
+        scale_x = (win_w - 2 * margin_x) / span_x
+        scale_y = (win_h - 2 * margin_y - 40) / span_y
         scale = min(scale_x, scale_y)
         positions = {}
         for name, hub in self.graph.hubs.items():
@@ -88,31 +91,46 @@ class Visual:
             positions[name] = (px, py)
         return positions
 
-    def draw_connections(self, positions: dict[str, tuple[int, int]]) -> None:
+    def draw_connections(
+        self, positions: dict[str, tuple[int, int]]
+    ) -> None:
         for name, hub in self.graph.hubs.items():
             for neighbor in hub.links:
                 start_pos = positions[name]
                 end_pos = positions[neighbor]
-                pygame.draw.line(self.screen, (150, 150, 150), start_pos, end_pos, 2)
+                pygame.draw.line(
+                    self.screen, (150, 150, 150), start_pos, end_pos, 2
+                )
 
     def draw_zones(self, positions: dict[str, tuple[int, int]]) -> None:
         for name, hub in self.graph.hubs.items():
             pos = positions[name]
+            zone_type = str(hub.zone_type)
             if name == self.start.name:
                 radius = 35
-                color = self.resolve_color(str(hub.color) if hub.color else "green", hub.zone_type)
+                color = self.resolve_color(
+                    str(hub.color) if hub.color else "green", zone_type
+                )
             elif name == self.end.name:
                 radius = 35
-                color = self.resolve_color(str(hub.color) if hub.color else "yellow", hub.zone_type)
+                color = self.resolve_color(
+                    str(hub.color) if hub.color else "yellow", zone_type
+                )
             else:
                 radius = 22
-                color = self.resolve_color(str(hub.color) if hub.color else None, hub.zone_type)
+                color = self.resolve_color(
+                    str(hub.color) if hub.color else None, zone_type
+                )
             pygame.draw.circle(self.screen, color, pos, radius)
 
             if name in (self.start.name, self.end.name):
-                pygame.draw.circle(self.screen, (255, 255, 255), pos, radius, 3)
+                pygame.draw.circle(
+                    self.screen, (255, 255, 255), pos, radius, 3
+                )
             text = self.font.render(name, True, (255, 255, 255))
-            self.screen.blit(text, (pos[0] - len(name) * 3, pos[1] - radius - 12))
+            self.screen.blit(
+                text, (pos[0] - len(name) * 3, pos[1] - radius - 12)
+            )
 
     DRONE_COLORS: list[tuple[int, int, int]] = [
         (0,   120, 255), (255, 60,  60),  (255, 165, 0),   (0,   230, 230),
@@ -127,7 +145,9 @@ class Visual:
     def drone_color(self, drone_id: int) -> tuple[int, int, int]:
         return self.DRONE_COLORS[(drone_id - 1) % len(self.DRONE_COLORS)]
 
-    def draw_drones(self, drones: list, positions: dict[str, tuple[int, int]]) -> None:
+    def draw_drones(
+        self, drones: list, positions: dict[str, tuple[int, int]]
+    ) -> None:
 
         arrived = [d for d in drones if d.arrived]
         if arrived:
@@ -137,7 +157,9 @@ class Visual:
 
                 inner_r = 22 if n <= 6 else 30
                 for idx, drone in enumerate(arrived):
-                    angle = (2 * math.pi * idx / max(n, 1)) - math.pi / 2
+                    angle = (
+                        2 * math.pi * idx / max(n, 1)
+                    ) - math.pi / 2
                     spread = min(inner_r, 10 + n * 2)
                     dx = int(math.cos(angle) * spread)
                     dy = int(math.sin(angle) * spread)
@@ -147,7 +169,6 @@ class Visual:
                     pygame.draw.circle(self.screen, color, (cx, cy), 5)
                     lbl = self.font.render(f"D{drone.id}", True, color)
                     self.screen.blit(lbl, (cx - 6, cy - 14))
-
 
         total_drones = len(drones)
         angle_step = (2 * math.pi) / max(total_drones, 1)
@@ -170,10 +191,16 @@ class Visual:
                 if pos1 and pos2:
                     cx = int(pos1[0] + (pos2[0] - pos1[0]) * p) + ox
                     cy = int(pos1[1] + (pos2[1] - pos1[1]) * p) + oy
-                    pygame.draw.circle(self.screen, (255, 255, 255), (cx, cy), 9)
+                    pygame.draw.circle(
+                        self.screen, (255, 255, 255), (cx, cy), 9
+                    )
                     pygame.draw.circle(self.screen, color, (cx, cy), 8)
-                    text = self.font.render(f"D{drone.id}", True, (255, 255, 255))
-                    bg = pygame.Surface((text.get_width() + 4, text.get_height() + 4))
+                    text = self.font.render(
+                        f"D{drone.id}", True, (255, 255, 255)
+                    )
+                    bg = pygame.Surface(
+                        (text.get_width() + 4, text.get_height() + 4)
+                    )
                     bg.fill((0, 0, 0))
                     self.screen.blit(bg, (cx - 8, cy - 22))
                     self.screen.blit(text, (cx - 6, cy - 20))
@@ -182,20 +209,32 @@ class Visual:
                 if pos is None:
                     continue
                 cx, cy = pos[0] + ox, pos[1] + oy
-                pygame.draw.circle(self.screen, (255, 255, 255), (cx, cy), 9)
+                pygame.draw.circle(
+                    self.screen, (255, 255, 255), (cx, cy), 9
+                )
                 pygame.draw.circle(self.screen, color, (cx, cy), 8)
-                text = self.font.render(f"D{drone.id}", True, (255, 255, 255))
-                bg = pygame.Surface((text.get_width() + 4, text.get_height() + 4))
+                text = self.font.render(
+                    f"D{drone.id}", True, (255, 255, 255)
+                )
+                bg = pygame.Surface(
+                    (text.get_width() + 4, text.get_height() + 4)
+                )
                 bg.fill((0, 0, 0))
                 self.screen.blit(bg, (cx - 8, cy - 22))
                 self.screen.blit(text, (cx - 6, cy - 20))
 
-    def animate_moves(self, drones: list, positions: dict[str, tuple[int, int]], turn: int) -> None:
-        """Animate all drone moves smoothly over ANIMATION_DURATION seconds."""
+    def animate_moves(
+        self,
+        drones: list,
+        positions: dict[str, tuple[int, int]],
+        turn: int,
+    ) -> None:
+        """Animate all drone moves smoothly over ANIMATION_DURATION sec."""
         self.anim_state = {}
         for drone in drones:
             if drone.prev_zone and drone.prev_zone != drone.current_zone:
-                if drone.prev_zone in positions and drone.current_zone in positions:
+                if (drone.prev_zone in positions
+                        and drone.current_zone in positions):
                     self.anim_state[drone.id] = {
                         "from": drone.prev_zone,
                         "to": drone.current_zone,
@@ -219,7 +258,9 @@ class Visual:
             self.draw_zones(positions)
             self.draw_drones(drones, positions)
 
-            text = self.font.render(f"Turn: {turn}", True, (255, 255, 255))
+            text = self.font.render(
+                f"Turn: {turn}", True, (255, 255, 255)
+            )
             self.screen.blit(text, (10, 10))
 
             pygame.display.flip()
