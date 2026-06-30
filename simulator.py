@@ -107,8 +107,8 @@ class Simulator:
                     old_zone = dr.current_zone
                     dr.prev_zone = dr.current_zone
                     dr.current_zone = nxt
-                    dr.path_index += 1 
-                    moves.append(f"D{dr.id}-{old_zone}_{nxt}") 
+                    dr.path_index += 1
+                    moves.append(f"D{dr.id}-{old_zone}_{nxt}")
                 else:
                     dr.prev_zone = dr.current_zone
                     dr.current_zone = nxt
