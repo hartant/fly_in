@@ -65,10 +65,12 @@ def find_all_paths(
         if not path:
             break
 
-        throughput = min(
-            graph.hubs[z].max_drones
-            for z in path[1:-1]
-        ) if len(path) > 2 else n
+        if len(path) > 2:
+            throughput = float('inf')
+            for z in path[1:-1]:
+                throughput = min(throughput, graph.hubs[z].max_drones)
+        else:
+            throughput = n
 
         for _ in range(min(throughput, n - len(paths))):
             paths.append(path)

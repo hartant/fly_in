@@ -5,7 +5,7 @@ import pygame
 from models import HUB
 from graph import Graph
 
-FPS = 60
+FPS = 144
 ANIMATION_DURATION = 2
 
 

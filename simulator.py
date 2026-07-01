@@ -59,13 +59,12 @@ class Simulator:
                 if dest is None:
                     continue
 
-                current = zone_occupancy.get(dest, 0)
+                current = zone_occupancy.get(dest, 0) - 1
                 max_cap = self.graph.hubs[dest].max_drones
 
                 if current >= max_cap:
                     continue
 
-                zone_occupancy[dest] = zone_occupancy.get(dest, 0) + 1
                 dr.prev_zone = dr.current_zone
                 dr.current_zone = dest
                 dr.in_transit = False
@@ -93,7 +92,7 @@ class Simulator:
                     continue
 
                 pair = tuple(sorted([dr.current_zone, nxt]))
-                conn: tuple[str, str] = pair  # type: ignore
+                conn: tuple[str, str] = pair
                 current_on_conn = conn_usage.get(conn, 0)
                 max_conn = self.graph.hubs[
                     dr.current_zone
